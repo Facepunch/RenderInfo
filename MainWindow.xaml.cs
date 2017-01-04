@@ -20,11 +20,11 @@ namespace RenderInfo
     /// </summary>
     public partial class MainWindow : Window
     {
-        public RendererInstance[] Data;
+        public Facepunch.Unity.RenderInfo.RendererInstance[] Data;
 
         public MainWindow()
         {
-            Data = new RendererInstance[0];
+            Data = new Facepunch.Unity.RenderInfo.RendererInstance[0];
             DataContext = this;
 
             if ( App.Filename != null )
@@ -121,14 +121,14 @@ namespace RenderInfo
             try
             {
                 var str = System.IO.File.ReadAllText( v );
-                Data = Newtonsoft.Json.JsonConvert.DeserializeObject<List<RendererInstance>>( str ).ToArray();
+                Data = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Facepunch.Unity.RenderInfo.RendererInstance>>( str ).ToArray();
                 Title = "RenderInfo - " + System.IO.Path.GetFileName( v );
 
                 listBox.UnselectAll();
                 listBox.SelectedIndex = 0;
 
             }
-            catch ( System.Exception e )
+            catch ( System.Exception )
             {
                 
             }
