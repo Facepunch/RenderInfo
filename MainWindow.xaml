@@ -13,12 +13,22 @@
 			<ColumnDefinition Width="447*"/>
 		</Grid.ColumnDefinitions>
 
-		<DataGrid RowHeaderWidth="0"  ItemsSource="{Binding RenderData}" x:Name="dataGrid" Grid.Column="1" Margin="10,10,10,10" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" HorizontalGridLinesBrush="#ddd" VerticalGridLinesBrush="#ddd"/>
+		<DataGrid RowHeaderWidth="0" x:Name="dataGrid" Grid.Column="1" Margin="10,10,10,10" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" HorizontalGridLinesBrush="#ddd" VerticalGridLinesBrush="#ddd" AutoGeneratingColumn="GenerateColumn">
+			<DataGrid.Resources>
+				<DataTemplate x:Key="IntegerTemplate">
+					<TextBlock HorizontalAlignment="Right"/>
+				</DataTemplate>
+			</DataGrid.Resources>
+		</DataGrid>
 		<ListBox x:Name="listBox" HorizontalAlignment="Stretch" Margin="10,10,0,10" VerticalAlignment="Stretch">
 			<ListBoxItem Content="Stats" Selected="Stats" IsSelected="True"></ListBoxItem>
+			<ListBoxItem Content="Entity Types" Selected="GroupByEntity"></ListBoxItem>
 			<ListBoxItem Content="Renderer Types" Selected="GroupByType"></ListBoxItem>
 			<ListBoxItem Content="Meshes" Selected="GroupByMesh"></ListBoxItem>
 			<ListBoxItem Content="Skinned Meshes" Selected="GroupBySkinnedMesh"></ListBoxItem>
+			<ListBoxItem Content="Particle Systems" Selected="GroupByParticleSystem"></ListBoxItem>
+			<ListBoxItem Content="Billboards" Selected="GroupByBillboards"></ListBoxItem>
+			<ListBoxItem Content="Far Away" Selected="GroupByFarAway"></ListBoxItem>
 		</ListBox>
 
 	</Grid>

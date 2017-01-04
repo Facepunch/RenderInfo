@@ -27,12 +27,12 @@ namespace RenderInfo
             Data = new Facepunch.Unity.RenderInfo.RendererInstance[0];
             DataContext = this;
 
+            InitializeComponent();
+
             if ( App.Filename != null )
             {
                 OpenFile( App.Filename );
-            }
-
-            InitializeComponent();
+            }            
         }
 
         private void Stats( object sender, RoutedEventArgs e )
@@ -59,15 +59,36 @@ namespace RenderInfo
             };
         }
 
+        private void GroupByEntity( object sender, RoutedEventArgs e )
+        {
+            dataGrid.ItemsSource = Data.Where( x => x.EntityName != null )
+                .GroupBy( x => x.EntityName )
+                .Select( x => new
+                {
+                    Type = x.Key,
+                    Count = x.GroupBy( y => y.EntityId ).Count(),
+                    Active = x.GroupBy( y => y.EntityId ).Count( y => y.Any( z => z.Enabled && z.IsVisible ) ),
+                    TotalVertex = x.Sum( y => y.VertexCount ),
+                    TotalVertexVisible = x.Where( y => y.IsVisible ).Sum( y => y.VertexCount ),
+                    TotalParticlesVisible = x.Where( y => y.IsVisible ).Sum( y => y.ParticleCount ),
+                    MinDistance = x.Where( y => y.IsVisible ).DefaultIfEmpty().Min( y => (int)y.Distance ),
+                    MaxDistance = x.Where( y => y.IsVisible ).DefaultIfEmpty().Max( y => (int)y.Distance ),
+                } )
+                .OrderByDescending( x => x.Count );
+        }
+
         private void GroupByType( object sender, RoutedEventArgs e )
         {
             dataGrid.ItemsSource = Data.GroupBy( x => x.RenderType )
                 .Select( x => new
                 {
-                  Type = x.Key,
-                  Count = x.Count(),
-                  Active = x.Count( y => y.Enabled && y.IsVisible )
-                })
+                    Type = x.Key,
+                    Count = x.Count(),
+                    Active = x.Count( y => y.Enabled && y.IsVisible ),
+                    VertexVisible = x.Where( y => y.IsVisible ).Sum( y => y.VertexCount ),
+                    MinDistance = x.Where( y => y.IsVisible ).DefaultIfEmpty().Min( y => (int)y.Distance ),
+                    MaxDistance = x.Where( y => y.IsVisible ).DefaultIfEmpty().Max( y => (int)y.Distance ),
+                } )
                 .OrderByDescending( x => x.Count );
         }
 
@@ -82,7 +103,9 @@ namespace RenderInfo
                     Count = x.Count(),
                     Active = x.Count( y => y.Enabled && y.IsVisible ),
                     VertexVisible = x.Where( y => y.IsVisible ).Sum( y => y.VertexCount ),
-                    VertexSingle = x.First().VertexCount
+                    VertexSingle = x.First().VertexCount,
+                    MinDistance = x.Where( y => y.IsVisible ).DefaultIfEmpty().Min( y => (int)y.Distance ),
+                    MaxDistance = x.Where( y => y.IsVisible ).DefaultIfEmpty().Max( y => (int)y.Distance ),
                 } )
                 .OrderByDescending( x => x.Count );
         }
@@ -98,7 +121,58 @@ namespace RenderInfo
                     Count = x.Count(),
                     Active = x.Count( y => y.Enabled && y.IsVisible ),
                     VertexVisible = x.Where( y => y.IsVisible ).Sum( y => y.VertexCount ),
-                    VertexSingle = x.First().VertexCount
+                    VertexSingle = x.First().VertexCount,
+                    MinDistance = x.Where( y => y.IsVisible ).DefaultIfEmpty().Min( y => (int)y.Distance ),
+                    MaxDistance = x.Where( y => y.IsVisible ).DefaultIfEmpty().Max( y => (int)y.Distance ),
+                } )
+                .OrderByDescending( x => x.Count );
+        }
+
+        private void GroupByParticleSystem( object sender, RoutedEventArgs e )
+        {
+            dataGrid.ItemsSource = Data
+                .Where( x => x.RenderType == "ParticleSystemRenderer" )
+                .GroupBy( x => x.MeshName )
+                .Select( x => new
+                {
+                    Type = x.Key,
+                    Count = x.Count(),
+                    Active = x.Count( y => y.Enabled && y.IsVisible ),
+                    Particles = x.Sum( y => y.ParticleCount ),
+                    MinDistance = x.Where( y => y.IsVisible ).DefaultIfEmpty().Min( y => (int)y.Distance ),
+                    MaxDistance = x.Where( y => y.IsVisible ).DefaultIfEmpty().Max( y => (int)y.Distance ),
+                } )
+                .OrderByDescending( x => x.Count );
+        }
+
+        private void GroupByBillboards( object sender, RoutedEventArgs e )
+        {
+            dataGrid.ItemsSource = Data
+                .Where( x => x.RenderType == "BillboardRenderer" )
+                .GroupBy( x => x.EntityName == null ? x.ObjectName : x.EntityName )
+                .Select( x => new
+                {
+                    Type = x.Key,
+                    Count = x.Count(),
+                    Active = x.Count( y => y.Enabled && y.IsVisible ),
+                    MinDistance = x.Where( y => y.IsVisible ).DefaultIfEmpty().Min( y => (int)y.Distance ),
+                    MaxDistance = x.Where( y => y.IsVisible ).DefaultIfEmpty().Max( y => (int)y.Distance ),
+                } )
+                .OrderByDescending( x => x.Count );
+        }
+
+        private void GroupByFarAway( object sender, RoutedEventArgs e )
+        {
+            dataGrid.ItemsSource = Data
+                .Where( x => x.Distance > 500 && x.IsVisible )
+                .GroupBy( x => x.EntityName == null ? x.ObjectName : x.EntityName )
+                .Select( x => new
+                {
+                    Type = x.Key,
+                    Count = x.Count(),
+                    Active = x.Count( y => y.Enabled && y.IsVisible ),
+                    VertexVisible = x.Where( y => y.IsVisible ).Sum( y => y.VertexCount ),
+                    VertexSingle = x.First().VertexCount,
                 } )
                 .OrderByDescending( x => x.Count );
         }
@@ -120,6 +194,11 @@ namespace RenderInfo
         {
             try
             {
+                Data = new Facepunch.Unity.RenderInfo.RendererInstance[0];
+                dataGrid.ItemsSource = Data;
+
+                GC.Collect();
+
                 var str = System.IO.File.ReadAllText( v );
                 Data = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Facepunch.Unity.RenderInfo.RendererInstance>>( str ).ToArray();
                 Title = "RenderInfo - " + System.IO.Path.GetFileName( v );
@@ -132,6 +211,11 @@ namespace RenderInfo
             {
                 
             }
+        }
+
+        private void GenerateColumn( object sender, DataGridAutoGeneratingColumnEventArgs e )
+        {
+            e.Column.CellStyle = dataGrid.FindResource( "IntegerTemplate" ) as Style;
         }
     }
 }
