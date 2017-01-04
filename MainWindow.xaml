@@ -1,0 +1,25 @@
+﻿<Window x:Class="RenderInfo.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:RenderInfo"
+        mc:Ignorable="d"
+        Title="RenderInfo" Height="583.28" Width="756.995" Drop="OnDroppedFile" AllowDrop="true">
+	<Grid>
+
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="150*"/>
+			<ColumnDefinition Width="447*"/>
+		</Grid.ColumnDefinitions>
+
+		<DataGrid RowHeaderWidth="0"  ItemsSource="{Binding RenderData}" x:Name="dataGrid" Grid.Column="1" Margin="10,10,10,10" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" HorizontalGridLinesBrush="#ddd" VerticalGridLinesBrush="#ddd"/>
+		<ListBox x:Name="listBox" HorizontalAlignment="Stretch" Margin="10,10,0,10" VerticalAlignment="Stretch">
+			<ListBoxItem Content="Stats" Selected="Stats" IsSelected="True"></ListBoxItem>
+			<ListBoxItem Content="Renderer Types" Selected="GroupByType"></ListBoxItem>
+			<ListBoxItem Content="Meshes" Selected="GroupByMesh"></ListBoxItem>
+			<ListBoxItem Content="Skinned Meshes" Selected="GroupBySkinnedMesh"></ListBoxItem>
+		</ListBox>
+
+	</Grid>
+</Window>
