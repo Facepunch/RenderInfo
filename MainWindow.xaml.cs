@@ -161,21 +161,6 @@ namespace RenderInfo
                 .OrderByDescending( x => x.Count );
         }
 
-        private void GroupByFarAway( object sender, RoutedEventArgs e )
-        {
-            dataGrid.ItemsSource = Data
-                .Where( x => x.Distance > 500 && x.IsVisible )
-                .GroupBy( x => x.EntityName == null ? x.ObjectName : x.EntityName )
-                .Select( x => new
-                {
-                    Type = x.Key,
-                    Count = x.Count(),
-                    Active = x.Count( y => y.Enabled && y.IsVisible ),
-                    VertexVisible = x.Where( y => y.IsVisible ).Sum( y => y.VertexCount ),
-                    VertexSingle = x.First().VertexCount,
-                } )
-                .OrderByDescending( x => x.Count );
-        }
 
         private void OnDroppedFile( object sender, DragEventArgs e )
         {
@@ -188,6 +173,60 @@ namespace RenderInfo
                 // handling code you have defined.
                 OpenFile( files[0] );
             }
+        }
+
+        private void MediumDistance( object sender, RoutedEventArgs e )
+        {
+            dataGrid.ItemsSource = Data
+                .Where( x => x.IsVisible && x.Distance > 250 && x.Distance < 500 )
+                .GroupBy( x => x.MeshName )
+                .Select( x => new
+                {
+                    Type = x.Key,
+                    Count = x.Count(),
+                    VertexVisible = x.Where( y => y.IsVisible ).Sum( y => y.VertexCount ),
+                    VertexSingle = x.First().VertexCount,
+                    MinDistance = x.Where( y => y.IsVisible ).DefaultIfEmpty().Min( y => (int)y.Distance ),
+                    MaxDistance = x.Where( y => y.IsVisible ).DefaultIfEmpty().Max( y => (int)y.Distance ),
+                    CastsShadows = x.Any( y => y.CastShadows )
+                } )
+                .OrderByDescending( x => x.Count );
+        }
+
+        private void FarDistance( object sender, RoutedEventArgs e )
+        {
+            dataGrid.ItemsSource = Data
+                .Where( x => x.IsVisible && x.Distance > 500 && x.Distance < 1500 )
+                .GroupBy( x => x.MeshName )
+                .Select( x => new
+                {
+                    Type = x.Key,
+                    Count = x.Count(),
+                    VertexVisible = x.Where( y => y.IsVisible ).Sum( y => y.VertexCount ),
+                    VertexSingle = x.First().VertexCount,
+                    MinDistance = x.Where( y => y.IsVisible ).DefaultIfEmpty().Min( y => (int)y.Distance ),
+                    MaxDistance = x.Where( y => y.IsVisible ).DefaultIfEmpty().Max( y => (int)y.Distance ),
+                    CastsShadows = x.Any( y => y.CastShadows )
+                } )
+                .OrderByDescending( x => x.Count );
+        }
+
+        private void VeryFarDistance( object sender, RoutedEventArgs e )
+        {
+            dataGrid.ItemsSource = Data
+                .Where( x => x.IsVisible && x.Distance > 1500 )
+                .GroupBy( x => x.MeshName )
+                .Select( x => new
+                {
+                    Type = x.Key,
+                    Count = x.Count(),
+                    VertexVisible = x.Where( y => y.IsVisible ).Sum( y => y.VertexCount ),
+                    VertexSingle = x.First().VertexCount,
+                    MinDistance = x.Where( y => y.IsVisible ).DefaultIfEmpty().Min( y => (int)y.Distance ),
+                    MaxDistance = x.Where( y => y.IsVisible ).DefaultIfEmpty().Max( y => (int)y.Distance ),
+                    CastsShadows = x.Any( y => y.CastShadows )
+                } )
+                .OrderByDescending( x => x.Count );
         }
 
         private void OpenFile( string v )

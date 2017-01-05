@@ -28,7 +28,9 @@
 			<ListBoxItem Content="Skinned Meshes" Selected="GroupBySkinnedMesh"></ListBoxItem>
 			<ListBoxItem Content="Particle Systems" Selected="GroupByParticleSystem"></ListBoxItem>
 			<ListBoxItem Content="Billboards" Selected="GroupByBillboards"></ListBoxItem>
-			<ListBoxItem Content="Far Away" Selected="GroupByFarAway"></ListBoxItem>
+			<ListBoxItem Content="250-500m" Selected="MediumDistance"></ListBoxItem>
+			<ListBoxItem Content="500-1500m" Selected="FarDistance"></ListBoxItem>
+			<ListBoxItem Content="1500m+" Selected="VeryFarDistance"></ListBoxItem>
 		</ListBox>
 
 	</Grid>
