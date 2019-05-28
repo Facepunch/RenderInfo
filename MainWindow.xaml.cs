@@ -24,7 +24,7 @@ namespace RenderInfo
 
         public MainWindow()
         {
-            Data = new Facepunch.Unity.RenderInfo.RendererInstance[0];
+			Data = new Facepunch.Unity.RenderInfo.RendererInstance[0];
             DataContext = this;
 
             InitializeComponent();
@@ -246,10 +246,10 @@ namespace RenderInfo
                 listBox.SelectedIndex = 0;
 
             }
-            catch ( System.Exception )
+            catch ( System.Exception e )
             {
-                
-            }
+				MessageBox.Show( e.Message, "Error opening report", MessageBoxButton.OK, MessageBoxImage.Error );
+			}
         }
 
         private void GenerateColumn( object sender, DataGridAutoGeneratingColumnEventArgs e )
